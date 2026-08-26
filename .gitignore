@@ -1,0 +1,53 @@
+# Maven
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.jar
+
+# IntelliJ IDEA
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+
+# Eclipse (in case anyone on the team uses it)
+.classpath
+.project
+.settings/
+bin/
+
+# VS Code
+.vscode/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Selenium / test artifacts
+test-output/
+screenshots/
+*.png
+*.mp4
+allure-results/
+allure-report/
+extent-reports/
+
+# WebDriver binaries (if you drop them in-project instead of using WebDriverManager)
+*.exe
+chromedriver
+geckodriver
+
+# Environment / secrets
+.env
+*.properties.local
