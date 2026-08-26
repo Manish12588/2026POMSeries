@@ -1,11 +1,15 @@
 package com.qa.opencart.pages;
 
+import static com.qa.opencart.constants.AppConstants.*;
+
+import com.qa.opencart.utils.ElementUtil;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 
 public class LoginPage {
 
     private WebDriver driver;
+    private ElementUtil elementUtil;
 
     //1. Maintain private By Locator
     private final By email = By.id("input-email");
@@ -17,34 +21,33 @@ public class LoginPage {
 
     public LoginPage(WebDriver driver) {
         this.driver = driver;
+        elementUtil = new ElementUtil(driver);
     }
 
     //3. Public page method/actions
     public String getLoginPageTitle() {
-        String title = driver.getTitle();
+        String title = elementUtil.waitForTitleIs(LOGIN_PAGE_TITLE, DEFAULT_TIMEOUT);
         System.out.println("Login page title: " + title);
         return title;
     }
 
     public String getLoginPageUrl() {
-        String url = driver.getCurrentUrl();
+        String url = elementUtil.waitForURLContains(LOGIN_PAGE_FRACTION_URL, DEFAULT_TIMEOUT);
         System.out.println("Login page url: " + url);
         return url;
     }
 
     public boolean isForgotPasswordLinkExist() {
-        return driver.findElement(forgotPwdLink).isDisplayed();
+        return elementUtil.isElementDisplayed(forgotPwdLink);
     }
 
-    public String doLogin(String uname, String pwd) throws InterruptedException {
+    public AccountsPage doLogin(String uname, String pwd) {
         System.out.println("user credentials: " + uname + " : " + pwd);
-        driver.findElement(email).sendKeys(uname);
-        driver.findElement(password).sendKeys(pwd);
-        driver.findElement(loginBtn).click();
-        Thread.sleep(2000);    //Added Hard coded sleep will need to remove this later on
-        String title = driver.getTitle();
-        System.out.println("Account page title: " + title);
-        return title;
+        elementUtil.waitForElementVisible(email, MEDIUM_DEFAULT_TIMEOUT).sendKeys(uname);
+        elementUtil.doSendKeys(password, pwd);
+        elementUtil.doClick(loginBtn);
+        return new AccountsPage(driver);
+
     }
 
 

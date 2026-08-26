@@ -1,8 +1,11 @@
 package com.qa.opencart.tests;
 
 import com.qa.opencart.base.BaseTest;
+import com.qa.opencart.pages.AccountsPage;
 import org.testng.Assert;
 import org.testng.annotations.Test;
+
+import static com.qa.opencart.constants.AppConstants.*;
 
 public class LoginPageTest extends BaseTest {
     //Here we will be writing testng code
@@ -10,13 +13,13 @@ public class LoginPageTest extends BaseTest {
     @Test
     public void loginPageTitleTest() {
         String title = loginPage.getLoginPageTitle();
-        Assert.assertEquals(title, "Account Login");
+        Assert.assertEquals(title, LOGIN_PAGE_TITLE);
     }
 
     @Test
     public void loginPageUrlTest() {
         String actualUrl = loginPage.getLoginPageUrl();
-        Assert.assertTrue(actualUrl.contains("route=account/login"));
+        Assert.assertTrue(actualUrl.contains(LOGIN_PAGE_FRACTION_URL));
     }
 
     @Test
@@ -24,10 +27,10 @@ public class LoginPageTest extends BaseTest {
         Assert.assertTrue(loginPage.isForgotPasswordLinkExist());
     }
 
-    @Test (priority = Short.MAX_VALUE)
-    public void loginTest() throws InterruptedException {
-        String title = loginPage.doLogin("manishkumar@gmail.com", "Automation@123");
-        Assert.assertEquals(title, "My Account");
+    @Test(priority = Short.MAX_VALUE)
+    public void loginTest() {
+        accountsPage = loginPage.doLogin(properties.getProperty("username"), properties.getProperty("password"));
+        Assert.assertEquals(accountsPage.getAccountPageTitle(), HOME_PAGE_TITLE);
     }
 
 }
