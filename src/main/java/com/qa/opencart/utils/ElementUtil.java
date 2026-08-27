@@ -1,11 +1,13 @@
 package com.qa.opencart.utils;
 
+import com.qa.opencart.constants.AppConstants;
 import org.openqa.selenium.*;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.*;
 
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class ElementUtil {
@@ -18,10 +20,11 @@ public class ElementUtil {
     }
 
     public WebElement getElement(By locator) {
-        return driver.findElement(locator);
+        //return driver.findElement(locator);
+        return  waitForElementVisible(locator, 5);
     }
 
-    public WebElement getElement(By locator, int timeOut) {
+    public WebElement getElementWithWait(By locator, int timeOut) {
         return waitForElementVisible(locator, timeOut);
     }
 
@@ -65,17 +68,26 @@ public class ElementUtil {
 
     public void doSendKeys(By locator, String value) {
         nullCheck(value);
+        getElement(locator).clear();
         getElement(locator).sendKeys(value);
     }
 
     public void doSendKeys(String locatorType, String locatorValue, String value) {
         nullCheck(value);
+        getElement(locatorType, locatorValue).clear();
         getElement(locatorType, locatorValue).sendKeys(value);
     }
 
     public void doSendKeys(By locator, CharSequence... value) {
         nullCheck(value);
+        getElement(locator).clear();
         getElement(locator).sendKeys(value);
+    }
+
+    public void doSendKeys(String locatorType, String locatorValue, CharSequence... value) {
+        nullCheck(value);
+        getElement(locatorType, locatorValue).clear();
+        getElement(locatorType, locatorValue).sendKeys(value);
     }
 
 
@@ -371,23 +383,29 @@ public class ElementUtil {
     /**
      * An expectation for checking that all elements present on the web page that match the locator are visible.
      * Visibility means that the elements are not only displayed but also have a height and width that is greater than 0.
+     *
      * @param locator
      * @param timeOut
      * @return
      */
     public List<WebElement> waitForAllElementVisible(By locator, int timeOut) {
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(timeOut));
-        return wait.until(ExpectedConditions.visibilityOfAllElementsLocatedBy(locator));
-    }
+        try {
+            return wait.until(ExpectedConditions.visibilityOfAllElementsLocatedBy(locator));
+        } catch (TimeoutException e) {
+            return Collections.EMPTY_LIST;
+        }
 
+    }
 
 
     /**
      * An expectation for checking an element is visible and enabled such that you can click it.
+     *
      * @param locator
      * @param timeout
      */
-    public void clickWhenReady(By locator, int timeout){
+    public void clickWhenReady(By locator, int timeout) {
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(timeout));
         wait.until(ExpectedConditions.elementToBeClickable(locator)).click();
     }
@@ -498,7 +516,7 @@ public class ElementUtil {
 
     }
 
-    public WebElement waitForElementVisibleWithFluentWait(By locator, int timeOut, int pollingTime){
+    public WebElement waitForElementVisibleWithFluentWait(By locator, int timeOut, int pollingTime) {
         Wait<WebDriver> wait = new FluentWait<WebDriver>(driver)
                 .withTimeout(Duration.ofSeconds(timeOut))
                 .pollingEvery(Duration.ofSeconds(pollingTime))
@@ -508,7 +526,7 @@ public class ElementUtil {
         return wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
     }
 
-    public WebElement waitForElementPresenceWithFluentWait(By locator, int timeOut, int pollingTime){
+    public WebElement waitForElementPresenceWithFluentWait(By locator, int timeOut, int pollingTime) {
         Wait<WebDriver> wait = new FluentWait<WebDriver>(driver)
                 .withTimeout(Duration.ofSeconds(timeOut))
                 .pollingEvery(Duration.ofSeconds(pollingTime))

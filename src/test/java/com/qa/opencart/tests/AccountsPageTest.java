@@ -5,11 +5,12 @@ import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import java.util.List;
+
 import static com.qa.opencart.constants.AppConstants.*;
 
 public class AccountsPageTest extends BaseTest {
     //Pre-condition for Account Test Page is user should be logged-in
-
     @BeforeClass
     public void accPageSetup() {
         accountsPage = loginPage.doLogin(properties.getProperty("username"), properties.getProperty("password"));
@@ -24,5 +25,12 @@ public class AccountsPageTest extends BaseTest {
     public void accPageUrlTest() {
         Assert.assertTrue(accountsPage.getAccountPageUrl().contains(HOME_PAGE_FRACTION_URL));
     }
+
+    @Test
+    public void accPageHeadersTest() {
+        List<String> actualHeaderList = accountsPage.getAccountsPageHeader();
+        Assert.assertEquals(actualHeaderList, expectedAccPageHeaderList);
+    }
+
 
 }
