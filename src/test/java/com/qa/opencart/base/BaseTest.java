@@ -5,6 +5,7 @@ import com.qa.opencart.pages.*;
 import org.openqa.selenium.WebDriver;
 import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeTest;
+import org.testng.annotations.Parameters;
 
 import java.util.Properties;
 
@@ -19,19 +20,25 @@ public class BaseTest {
     protected RegisterPage registerPage;
 
 
-
     //Pre-condition
+    @Parameters({"browser"})
     @BeforeTest
-    public void setup() {
+    public void setup(String browserName) {
         driverFactory = new DriverFactory();
         properties = driverFactory.initProp();
+
+        //Browser name is passed from .xml file
+        if (browserName != null) {
+            properties.setProperty("browser", browserName);
+        }
+
         driver = driverFactory.initDriver(properties);
         loginPage = new LoginPage(driver);
     }
 
     //Post-condition
     @AfterTest
-    public void tearDown(){
+    public void tearDown() {
         driver.quit();
     }
 }
