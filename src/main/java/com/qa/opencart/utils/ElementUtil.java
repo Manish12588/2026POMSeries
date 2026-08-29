@@ -1,6 +1,7 @@
 package com.qa.opencart.utils;
 
-import com.qa.opencart.constants.AppConstants;
+import static com.qa.opencart.constants.AppConstants.*;
+
 import org.openqa.selenium.*;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.*;
@@ -21,7 +22,8 @@ public class ElementUtil {
 
     public WebElement getElement(By locator) {
         //return driver.findElement(locator);
-        return  waitForElementVisible(locator, 5);
+//        return waitForElementVisible(locator, 10);
+        return waitForElementVisible(locator, MEDIUM_DEFAULT_TIMEOUT);
     }
 
     public WebElement getElementWithWait(By locator, int timeOut) {

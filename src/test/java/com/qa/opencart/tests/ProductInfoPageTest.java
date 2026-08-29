@@ -1,6 +1,10 @@
 package com.qa.opencart.tests;
 
 import com.qa.opencart.base.BaseTest;
+
+import static com.qa.opencart.constants.AppConstants.*;
+
+import com.qa.opencart.utils.ExcelUtil;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
@@ -35,6 +39,7 @@ public class ProductInfoPageTest extends BaseTest {
         Assert.assertEquals(actualHeader, productName);
     }
 
+    //Directly Passing the data through code
     @DataProvider
     public Object[][] getProductImageTestData() {
         return new Object[][]{
@@ -46,12 +51,19 @@ public class ProductInfoPageTest extends BaseTest {
         };
     }
 
-    @Test(dataProvider = "getProductImageTestData")
-    public void getProductImageCountTest(String searchKey, String productName, int expectedImageCount) {
+    //Fetching Data From Excel Sheet
+    @DataProvider
+    public Object[][] getProductSheetData() {
+        return ExcelUtil.getTestData(PRODUCT_SHEET_NAME);
+
+    }
+
+    @Test(dataProvider = "getProductSheetData")
+    public void getProductImageCountTest(String searchKey, String productName, String expectedImageCount) {
         searchResultPage = accountsPage.doSearch(searchKey);
         productInfoPage = searchResultPage.selectProduct(productName);
         int actualImageCount = productInfoPage.getProductImagesCount();
-        Assert.assertEquals(actualImageCount, expectedImageCount);
+        Assert.assertEquals(String.valueOf(actualImageCount), expectedImageCount);
     }
 
     @Test

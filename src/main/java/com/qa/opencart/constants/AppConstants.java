@@ -14,4 +14,10 @@ public class AppConstants {
 
     public static List<String> expectedAccPageHeaderList = List.of("My Account","My Orders","My Affiliate Account","Newsletter");
 
+    public static final String REGISTER_SUCCESS_MESSAGE = "Your Account Has Been Created!";
+
+    //********** SHEET NAMES *****************//
+    public static final String REGISTER_SHEET_NAME = "Register";
+    public static final String PRODUCT_SHEET_NAME = "Product";
+
 }
