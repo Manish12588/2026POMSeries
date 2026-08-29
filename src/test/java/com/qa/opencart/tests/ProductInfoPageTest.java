@@ -4,6 +4,7 @@ import com.qa.opencart.base.BaseTest;
 
 import static com.qa.opencart.constants.AppConstants.*;
 
+import com.qa.opencart.utils.CSVUtil;
 import com.qa.opencart.utils.ExcelUtil;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
@@ -58,7 +59,13 @@ public class ProductInfoPageTest extends BaseTest {
 
     }
 
-    @Test(dataProvider = "getProductSheetData")
+    //Fetching the data from csv file
+    @DataProvider
+    public Object[][] getProductCSVData(){
+        return CSVUtil.csvData("product");
+    }
+
+    @Test(dataProvider = "getProductCSVData")
     public void getProductImageCountTest(String searchKey, String productName, String expectedImageCount) {
         searchResultPage = accountsPage.doSearch(searchKey);
         productInfoPage = searchResultPage.selectProduct(productName);

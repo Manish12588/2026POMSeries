@@ -2,6 +2,7 @@ package com.qa.opencart.utils;
 
 import static com.qa.opencart.constants.AppConstants.*;
 
+import com.qa.opencart.factory.DriverFactory;
 import org.openqa.selenium.*;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.*;
@@ -14,16 +15,18 @@ import java.util.List;
 public class ElementUtil {
     private WebDriver driver;
     private Actions action;
+    private JavaScriptUtil javaScriptUtil;
 
     public ElementUtil(WebDriver driver) {
         this.driver = driver;
         action = new Actions(this.driver);
+        javaScriptUtil = new JavaScriptUtil(driver);
     }
 
     public WebElement getElement(By locator) {
-        //return driver.findElement(locator);
-//        return waitForElementVisible(locator, 10);
-        return waitForElementVisible(locator, MEDIUM_DEFAULT_TIMEOUT);
+        WebElement element = waitForElementVisible(locator, MEDIUM_DEFAULT_TIMEOUT);
+        javaScriptUtil.flash(element);
+        return element;
     }
 
     public WebElement getElementWithWait(By locator, int timeOut) {
@@ -536,6 +539,12 @@ public class ElementUtil {
                 .ignoring(StaleElementReferenceException.class)
                 .withMessage("==== ELEMENT NOT FOUND ========");
         return wait.until(ExpectedConditions.presenceOfElementLocated(locator));
+    }
+
+    private void highlightElement(WebElement element) {
+        if (Boolean.parseBoolean(DriverFactory.highlight)) {
+            javaScriptUtil.flash(element);
+        }
     }
 
 }

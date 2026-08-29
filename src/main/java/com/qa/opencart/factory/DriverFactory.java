@@ -16,6 +16,7 @@ public class DriverFactory {
     //Responsible to initialize my driver
     WebDriver driver;
     Properties properties;
+    public static String highlight;
 
     /**
      * This method is used to initialize the browser on the basis of given browser name
@@ -25,16 +26,18 @@ public class DriverFactory {
     public WebDriver initDriver(Properties properties) {
         String browserName = properties.getProperty("browser");
         System.out.println("Browser name: " + browserName);
+        OptionsManager optionsManager = new OptionsManager(properties); //Create an object of OptionManager class
+        highlight = properties.getProperty("highlight");
 
         switch (browserName.trim().toLowerCase()) {
             case "chrome":
-                driver = new ChromeDriver();
+                driver = new ChromeDriver(optionsManager.getChromeOptions());
                 break;
             case "edge":
-                driver = new EdgeDriver();
+                driver = new EdgeDriver(optionsManager.getEdgeOptions());
                 break;
             case "firefox":
-                driver = new FirefoxDriver();
+                driver = new FirefoxDriver(optionsManager.getFirefoxOptions());
                 break;
             case "safari":
                 driver = new SafariDriver();
@@ -51,6 +54,7 @@ public class DriverFactory {
 
     /**
      * This is used to initialize the config properties
+     *
      * @return
      */
     public Properties initProp() {
