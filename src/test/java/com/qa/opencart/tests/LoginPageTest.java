@@ -1,5 +1,6 @@
 package com.qa.opencart.tests;
 
+import com.aventstack.chaintest.plugins.ChainTestListener;
 import com.qa.opencart.base.BaseTest;
 import com.qa.opencart.pages.AccountsPage;
 import org.testng.Assert;
@@ -13,6 +14,7 @@ public class LoginPageTest extends BaseTest {
     @Test(description = "Checking Login Page Title")
     public void loginPageTitleTest() {
         String title = loginPage.getLoginPageTitle();
+        ChainTestListener.log("Checking Login Page Title: " + title);  //To generate log using ChainTestListener
         Assert.assertEquals(title, LOGIN_PAGE_TITLE);
     }
 

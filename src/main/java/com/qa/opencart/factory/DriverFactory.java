@@ -2,12 +2,15 @@ package com.qa.opencart.factory;
 
 import com.qa.opencart.exceptions.BrowserException;
 import com.qa.opencart.exceptions.FrameworkException;
+import org.openqa.selenium.OutputType;
+import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.edge.EdgeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.safari.SafariDriver;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -18,6 +21,8 @@ public class DriverFactory {
     WebDriver driver;
     Properties properties;
     public static String highlight;
+
+    public static ThreadLocal<WebDriver> tlDriver = new ThreadLocal<WebDriver>();
 
     /**
      * This method is used to initialize the browser on the basis of given browser name
@@ -32,25 +37,34 @@ public class DriverFactory {
 
         switch (browserName.trim().toLowerCase()) {
             case "chrome":
-                driver = new ChromeDriver(optionsManager.getChromeOptions());
+                tlDriver.set(new ChromeDriver(optionsManager.getChromeOptions()));
                 break;
             case "edge":
-                driver = new EdgeDriver(optionsManager.getEdgeOptions());
+                tlDriver.set(new EdgeDriver(optionsManager.getEdgeOptions()));
                 break;
             case "firefox":
-                driver = new FirefoxDriver(optionsManager.getFirefoxOptions());
+                tlDriver.set(new FirefoxDriver(optionsManager.getFirefoxOptions()));
                 break;
             case "safari":
                 driver = new SafariDriver();
                 break;
             default:
                 System.out.println("Please pass the valid browser name..." + browserName);
-                throw new BrowserException("===== INVALID BROWSER=======");
+                throw new BrowserException("===== INVALID BROWSER =======");
         }
-        driver.get(properties.getProperty("url"));
-        driver.manage().window().maximize();
-        driver.manage().deleteAllCookies();
-        return driver;
+        getDriver().get(properties.getProperty("url"));
+        getDriver().manage().window().maximize();
+        getDriver().manage().deleteAllCookies();
+        return getDriver();
+    }
+
+    /**
+     * getDriver: Get the local copy of threadDriver
+     *
+     * @return
+     */
+    public static WebDriver getDriver() {
+        return tlDriver.get();
     }
 
     /**
@@ -101,4 +115,21 @@ public class DriverFactory {
         }
         return properties;
     }
+
+    /**
+     * TakeScreenShots
+     */
+    public static File getScreenshotFile() {
+        return ((TakesScreenshot) getDriver()).getScreenshotAs(OutputType.FILE);
+    }
+
+    public static byte[] getScreenshotByte() {
+        return ((TakesScreenshot) getDriver()).getScreenshotAs(OutputType.BYTES);
+    }
+
+    public static String getScreenshotBase64() {
+        return ((TakesScreenshot) getDriver()).getScreenshotAs(OutputType.BASE64);
+    }
+
+
 }

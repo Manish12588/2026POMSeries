@@ -3,7 +3,7 @@ package com.qa.opencart.constants;
 import java.util.List;
 
 public class AppConstants {
-    public static final String LOGIN_PAGE_TITLE = "Account Login";
+    public static final String LOGIN_PAGE_TITLE = "Account Login11";
     public static final String HOME_PAGE_TITLE = "My Account";
     public static final String LOGIN_PAGE_FRACTION_URL = "route=account/login";
     public static final String HOME_PAGE_FRACTION_URL = "route=account/account";
