@@ -14,6 +14,8 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.release>17</maven.compiler.release>
+        <aspectj.version>1.9.25.1</aspectj.version>
+        <selenium.version>4.47.0</selenium.version>
     </properties>
 
     <dependencies>
@@ -22,7 +24,7 @@
         <dependency>
             <groupId>org.seleniumhq.selenium</groupId>
             <artifactId>selenium-java</artifactId>
-            <version>4.47.0</version>
+            <version>${selenium.version}</version>
             <scope>compile</scope>
         </dependency>
 
@@ -54,7 +56,20 @@
             <artifactId>chaintest-testng</artifactId>
             <version>1.0.12</version>
         </dependency>
+
+        <!-- Allure Report Dependency-->
+        <dependency>
+            <groupId>io.qameta.allure</groupId>
+            <artifactId>allure-testng</artifactId>
+            <version>2.35.4</version>
+        </dependency>
+        <dependency>
+            <groupId>org.aspectj</groupId>
+            <artifactId>aspectjweaver</artifactId>
+            <version>${aspectj.version}</version>
+        </dependency>
     </dependencies>
+
 
     <build>
         <plugins>
@@ -79,7 +94,17 @@
                         <suiteXmlFile>src/test/resources/testrunners/testng_regression.xml</suiteXmlFile>
                         <!--<suiteXmlFile>${suiteXmlFile}</suiteXmlFile>-->
                     </suiteXmlFiles>
+                    <argLine>
+                        -javaagent:"${settings.localRepository}/org/aspectj/aspectjweaver/${aspectj.version}/aspectjweaver-${aspectj.version}.jar"
+                    </argLine>
                 </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.aspectj</groupId>
+                        <artifactId>aspectjweaver</artifactId>
+                        <version>${aspectj.version}</version>
+                    </dependency>
+                </dependencies>
             </plugin>
         </plugins>
     </build>

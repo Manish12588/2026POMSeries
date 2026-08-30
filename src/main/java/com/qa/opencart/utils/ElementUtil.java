@@ -3,6 +3,7 @@ package com.qa.opencart.utils;
 import static com.qa.opencart.constants.AppConstants.*;
 
 import com.qa.opencart.factory.DriverFactory;
+import io.qameta.allure.Step;
 import org.openqa.selenium.*;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.*;
@@ -71,6 +72,7 @@ public class ElementUtil {
         return locator;
     }
 
+    @Step("Entering value: {1} into element: {0}")
     public void doSendKeys(By locator, String value) {
         nullCheck(value);
         getElement(locator).clear();
@@ -96,6 +98,7 @@ public class ElementUtil {
     }
 
 
+    @Step("Clicking on element using: {0}")
     public void doClick(By locator) {
         getElement(locator).click();
     }
