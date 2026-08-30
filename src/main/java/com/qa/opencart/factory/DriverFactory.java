@@ -2,6 +2,8 @@ package com.qa.opencart.factory;
 
 import com.qa.opencart.exceptions.BrowserException;
 import com.qa.opencart.exceptions.FrameworkException;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
@@ -10,17 +12,21 @@ import org.openqa.selenium.edge.EdgeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.safari.SafariDriver;
 
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Properties;
 
+
 public class DriverFactory {
     //Responsible to initialize my driver
     WebDriver driver;
     Properties properties;
     public static String highlight;
+
+    public static final Logger log = LogManager.getLogger(DriverFactory.class); //WARN, INFO, ERROR, FATAL
 
     public static ThreadLocal<WebDriver> tlDriver = new ThreadLocal<WebDriver>();
 
@@ -30,8 +36,9 @@ public class DriverFactory {
      * @param properties
      */
     public WebDriver initDriver(Properties properties) {
+        log.info("Properties: " + properties);
         String browserName = properties.getProperty("browser");
-        System.out.println("Browser name: " + browserName);
+        log.info("Browser Name: " + browserName);
         OptionsManager optionsManager = new OptionsManager(properties); //Create an object of OptionManager class
         highlight = properties.getProperty("highlight");
 
@@ -49,7 +56,7 @@ public class DriverFactory {
                 driver = new SafariDriver();
                 break;
             default:
-                System.out.println("Please pass the valid browser name..." + browserName);
+                log.error("Please pass the valid browser name..." + browserName);
                 throw new BrowserException("===== INVALID BROWSER =======");
         }
         getDriver().get(properties.getProperty("url"));
@@ -79,10 +86,10 @@ public class DriverFactory {
 
         try {
             if (envName == null) {
-                System.out.println("env is null, hence running test on QA environment.");
+                log.warn("env is null, hence running test on QA environment.");
                 fis = new FileInputStream("./src/test/resources/config/config.properties");
             } else {
-                System.out.println("Running test on env: " + envName);
+                log.info("Running test on env: {}", envName);
                 switch (envName.toLowerCase().trim()) {
                     case "qa":
                         fis = new FileInputStream("./src/test/resources/config/qa.config.properties");
@@ -100,7 +107,7 @@ public class DriverFactory {
                         fis = new FileInputStream("./src/test/resources/config/prod.config.properties");
                         break;
                     default:
-                        System.out.println("Please pass the correct environment.");
+                        log.error("----- Invalid Environment Name -------");
                         throw new FrameworkException("=== INVALID ENV NAME ==== :" + envName);
                 }
             }

@@ -3,7 +3,10 @@ package com.qa.opencart.base;
 import com.aventstack.chaintest.plugins.ChainTestListener;
 import com.qa.opencart.factory.DriverFactory;
 import com.qa.opencart.pages.*;
+import com.qa.opencart.utils.LogUtil;
 import org.openqa.selenium.WebDriver;
+import org.testng.ITestContext;
+import org.testng.ITestNGMethod;
 import org.testng.ITestResult;
 import org.testng.annotations.*;
 
@@ -42,7 +45,6 @@ public class BaseTest {
             ChainTestListener.embed(DriverFactory.getScreenshotFile(), "image/png");
         }
     }
-
 
     //Post-condition
     @AfterTest

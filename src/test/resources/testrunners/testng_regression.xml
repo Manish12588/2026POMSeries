@@ -6,6 +6,7 @@
     <listeners>
         <listener class-name="com.aventstack.chaintest.plugins.ChainTestListener"/>
         <listener class-name="com.qa.opencart.listeners.TestAllureListener"/>
+        <!--listener class-name="com.qa.opencart.listeners.AnnotationTransformer"/-->
     </listeners>
 
     <test name="Login Page Test_chrome">
@@ -27,12 +28,12 @@
     <!--        </classes>-->
     <!--    </test>-->
 
-<!--    <test name="Accounts Page Test_chrome">-->
-    <!--        <parameter name="browser" value="chrome"/>-->
-    <!--        <classes>-->
-    <!--            <class name="com.qa.opencart.tests.AccountsPageTest"/>-->
-    <!--        </classes>-->
-    <!--    </test>-->
+        <test name="Accounts Page Test_chrome">
+            <parameter name="browser" value="chrome"/>
+            <classes>
+                <class name="com.qa.opencart.tests.AccountsPageTest"/>
+            </classes>
+        </test>
     <!--    <test name="Accounts Page Test_firefox">-->
     <!--        <parameter name="browser" value="firefox"/>-->
     <!--        <classes>-->
@@ -47,12 +48,12 @@
     <!--    </test>-->
 
 
-    <!--    <test name="Search Page Test_chrome">-->
-    <!--        <parameter name="browser" value="chrome"/>-->
-    <!--        <classes>-->
-    <!--            <class name="com.qa.opencart.tests.SearchTest"/>-->
-    <!--        </classes>-->
-    <!--    </test>-->
+        <test name="Search Page Test_chrome">
+            <parameter name="browser" value="chrome"/>
+            <classes>
+                <class name="com.qa.opencart.tests.SearchTest"/>
+            </classes>
+        </test>
     <!--    <test name="Search Page Test_firefox">-->
     <!--        <parameter name="browser" value="firefox"/>-->
     <!--        <classes>-->
