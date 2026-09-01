@@ -10,15 +10,17 @@ pipeline
         {
             steps
             {
-                 git 'https://github.com/jglick/simple-maven-project-with-tests.git'
-                 sh "mvn -Dmaven.test.failure.ignore=true clean package"
+                dir('build') {
+                    git 'https://github.com/jglick/simple-maven-project-with-tests.git'
+                    sh "mvn -Dmaven.test.failure.ignore=true clean package"
+                }
             }
             post
             {
                 success
                 {
-                    junit '**/target/surefire-reports/TEST-*.xml'
-                    archiveArtifacts 'target/*.jar'
+                    junit '**/build/target/surefire-reports/TEST-*.xml'
+                    archiveArtifacts 'build/target/*.jar'
                 }
             }
         }
@@ -29,9 +31,11 @@ pipeline
         }
         stage('Regression Automation Tests') {
             steps {
-                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-                    git 'https://github.com/Manish12588/2026POMSeries.git'
-                    sh "mvn clean test -Dsurefire.suiteXmlFiles=src/test/resources/testrunners/testng_regression.xml -Denv=qa"
+                dir('regression') {
+                    catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                        git 'https://github.com/Manish12588/2026POMSeries.git'
+                        sh "mvn clean test -Dsurefire.suiteXmlFiles=src/test/resources/testrunners/testng_regression.xml -Denv=qa"
+                    }
                 }
             }
         }
@@ -43,7 +47,7 @@ pipeline
                         jdk: '',
                         properties: [],
                         reportBuildPolicy: 'ALWAYS',
-                        results: [[path: '/allure-results']]
+                        results: [[path: 'regression/allure-results']]
                     ])
                 }
             }
@@ -53,7 +57,7 @@ pipeline
                      publishHTML([allowMissing: false,
                                   alwaysLinkToLastBuild: false,
                                   keepAll: true,
-                                  reportDir: 'target/chaintest',
+                                  reportDir: 'regression/target/chaintest',
                                   reportFiles: 'Index.html',
                                   reportName: 'HTML Regression ChainTest Report',
                                   reportTitles: ''])
@@ -66,9 +70,11 @@ pipeline
         }
         stage('Sanity Automation Test') {
             steps {
-                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-                    git 'https://github.com/Manish12588/2026POMSeries.git'
-                    sh "mvn clean test -Dsurefire.suiteXmlFiles=src/test/resources/testrunners/testng_sanity.xml -Denv=stage"
+                dir('sanity') {
+                    catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                        git 'https://github.com/Manish12588/2026POMSeries.git'
+                        sh "mvn clean test -Dsurefire.suiteXmlFiles=src/test/resources/testrunners/testng_sanity.xml -Denv=stage"
+                    }
                 }
             }
         }
@@ -77,7 +83,7 @@ pipeline
                      publishHTML([allowMissing: false,
                                   alwaysLinkToLastBuild: false,
                                   keepAll: true,
-                                  reportDir: 'target/chaintest',
+                                  reportDir: 'sanity/target/chaintest',
                                   reportFiles: 'Index.html',
                                   reportName: 'HTML Sanity ChainTest Report',
                                   reportTitles: ''])
