@@ -10,10 +10,8 @@ pipeline
         {
             steps
             {
-                dir('build') {
                     git 'https://github.com/jglick/simple-maven-project-with-tests.git'
                     sh "mvn -Dmaven.test.failure.ignore=true clean package"
-                }
             }
             post
             {
@@ -31,12 +29,10 @@ pipeline
         }
         stage('Regression Automation Tests') {
             steps {
-                dir('regression') {
                     catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
                         git 'https://github.com/Manish12588/2026POMSeries.git'
                         sh "mvn clean test -Dsurefire.suiteXmlFiles=src/test/resources/testrunners/testng_regression.xml -Denv=qa"
                     }
-                }
             }
         }
         stage('Publish Allure Reports') {
