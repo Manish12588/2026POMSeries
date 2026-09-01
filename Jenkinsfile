@@ -32,9 +32,13 @@ pipeline
         stage('Regression Automation Tests') {
             steps {
                 dir('regression') {
-                    catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-                        git branch: 'main', url: 'https://github.com/Manish12588/2026POMSeries.git'
-                        sh "mvn clean test -Dsurefire.suiteXmlFiles=src/test/resources/testrunners/testng_regression.xml -Denv=qa"
+                    script {
+                        try {
+                            git branch: 'main', url: 'https://github.com/Manish12588/2026POMSeries.git'
+                            sh "mvn clean test -Dsurefire.suiteXmlFiles=src/test/resources/testrunners/testng_regression.xml -Denv=qa"
+                        } catch (err) {
+                            unstable("Regression tests failed: ${err}")
+                        }
                     }
                 }
             }
@@ -68,12 +72,16 @@ pipeline
                 echo("deploy to Stage")
             }
         }
-        stage('Sanity Automation Test') {
+        stage('Sanity Automation Tests') {
             steps {
                 dir('sanity') {
-                    catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-                        git branch: 'main', url: 'https://github.com/Manish12588/2026POMSeries.git'
-                        sh "mvn clean test -Dsurefire.suiteXmlFiles=src/test/resources/testrunners/testng_sanity.xml -Denv=stage"
+                    script {
+                        try {
+                            git branch: 'main', url: 'https://github.com/Manish12588/2026POMSeries.git'
+                            sh "mvn clean test -Dsurefire.suiteXmlFiles=src/test/resources/testrunners/testng_sanity.xml -Denv=stage"
+                        } catch (err) {
+                            unstable("Sanity tests failed: ${err}")
+                        }
                     }
                 }
             }
