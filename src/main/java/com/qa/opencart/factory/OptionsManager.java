@@ -25,6 +25,9 @@ public class OptionsManager {
             System.out.println("---- Running in incognito mode ----- ");
             chromeOption.addArguments("--incognito");
         }
+        if (Boolean.parseBoolean(prop.getProperty("remote"))) {
+            chromeOption.setCapability("browserName", "chrome");
+        }
         return chromeOption;
     }
 
@@ -36,6 +39,9 @@ public class OptionsManager {
         if (Boolean.parseBoolean(prop.getProperty("incognito"))) {
             firefoxOption.addArguments("--incognito");
         }
+        if (Boolean.parseBoolean(prop.getProperty("remote"))) {
+            firefoxOption.setCapability("browserName", "firefox");
+        }
         return firefoxOption;
     }
 
@@ -46,6 +52,9 @@ public class OptionsManager {
         }
         if (Boolean.parseBoolean(prop.getProperty("incognito"))) {
             edgeOption.addArguments("--inprivate");
+        }
+        if (Boolean.parseBoolean(prop.getProperty("remote"))) {
+            edgeOption.setCapability("browserName", "edge");
         }
         return edgeOption;
     }
