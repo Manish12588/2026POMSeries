@@ -27,7 +27,7 @@ public class BaseTest {
     //Pre-condition
     @Parameters({"browser"})
     @BeforeTest
-    public void setup(String browserName) {
+    public void setup(@Optional("chrome") String browserName) {
         driverFactory = new DriverFactory();
         properties = driverFactory.initProp();
 

@@ -47,9 +47,9 @@ public class LoginPage {
         return elementUtil.isElementDisplayed(forgotPwdLink);
     }
 
-    @Step("Login With Valid Username: {0} and Password: {1}")
+    @Step("Login With Valid Username: {0}")
     public AccountsPage doLogin(String uname, String pwd) {
-        System.out.println("user credentials: " + uname + " : " + pwd);
+        System.out.println("user credentials: userName: " + uname + ", Password: ******" );
         elementUtil.waitForElementVisible(email, MEDIUM_DEFAULT_TIMEOUT).sendKeys(uname);
         elementUtil.doSendKeys(password, pwd);
         elementUtil.doClick(loginBtn);

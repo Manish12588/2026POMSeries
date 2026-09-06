@@ -32,7 +32,7 @@ public class ProductInfoPageTest extends BaseTest {
         };
     }
 
-    @Test(dataProvider = "getProductTestData")
+    @Test(dataProvider = "getProductTestData", description = "Validating the header of products.")
     public void productHeaderTest(String searchKey, String productName) {
         searchResultPage = accountsPage.doSearch(searchKey);
         productInfoPage = searchResultPage.selectProduct(productName);
@@ -73,7 +73,7 @@ public class ProductInfoPageTest extends BaseTest {
         Assert.assertEquals(String.valueOf(actualImageCount), expectedImageCount);
     }
 
-    @Test
+    @Test(description = "Validating the Product Information on Product Page.")
     public void getProductInformationTest() {
         searchResultPage = accountsPage.doSearch("macbook");
         productInfoPage = searchResultPage.selectProduct("MacBook Pro");

@@ -24,8 +24,6 @@ import java.util.Properties;
 
 
 public class DriverFactory {
-    //Responsible to initialize my driver
-    WebDriver driver;
     Properties properties;
     public static String highlight;
     OptionsManager optionsManager;
@@ -39,7 +37,15 @@ public class DriverFactory {
      * @param properties
      */
     public WebDriver initDriver(Properties properties) {
-        log.info("Properties: " + properties);
+        //This is just to mask the password in logs
+        Properties safeProps = new Properties();
+        safeProps.putAll(properties);
+        if (safeProps.containsKey("password")) {
+            safeProps.setProperty("password", "******");
+        }
+        log.info("Properties: " + safeProps);
+
+        //Actual properties flows from here
         String browserName = properties.getProperty("browser");
         log.info("Browser Name: " + browserName);
         optionsManager = new OptionsManager(properties); //Create an object of OptionManager class

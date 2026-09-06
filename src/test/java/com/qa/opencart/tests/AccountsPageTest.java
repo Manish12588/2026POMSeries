@@ -1,6 +1,10 @@
 package com.qa.opencart.tests;
 
 import com.qa.opencart.base.BaseTest;
+import io.qameta.allure.Description;
+import io.qameta.allure.Owner;
+import io.qameta.allure.Severity;
+import io.qameta.allure.SeverityLevel;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -16,17 +20,21 @@ public class AccountsPageTest extends BaseTest {
         accountsPage = loginPage.doLogin(properties.getProperty("username"), properties.getProperty("password"));
     }
 
-    @Test
+    @Owner("Manish Kumar")
+    @Test(description = "Validating Title of Account Page.")
     public void accPageTitleTest() {
         Assert.assertEquals(accountsPage.getAccountPageTitle(), HOME_PAGE_TITLE);
     }
 
-    @Test
+    @Owner("Manish Kumar")
+    @Test(description = "Validating the URL of Account Page.")
     public void accPageUrlTest() {
         Assert.assertTrue(accountsPage.getAccountPageUrl().contains(HOME_PAGE_FRACTION_URL));
     }
 
-    @Test
+
+    @Owner("Manish Kumar")
+    @Test(description = "Validating the Headers on Account Page.")
     public void accPageHeadersTest() {
         List<String> actualHeaderList = accountsPage.getAccountsPageHeader();
         Assert.assertEquals(actualHeaderList, expectedAccPageHeaderList);
