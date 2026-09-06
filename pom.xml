@@ -21,7 +21,7 @@
     <distributionManagement>
         <snapshotRepository>
             <id>nexus-snapshots</id>
-            <url>http://admin:Automation123@localhost:8081/repository/maven-snapshots/</url>
+            <url>http://localhost:8081/repository/maven-snapshots/</url>
         </snapshotRepository>
     </distributionManagement>
 
@@ -87,7 +87,6 @@
             <version>2.26.1</version>
         </dependency>
     </dependencies>
-
 
     <build>
         <plugins>
