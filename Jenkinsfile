@@ -10,23 +10,12 @@ pipeline
         {
             steps
             {
-                dir('build') {
-                    git 'https://github.com/jglick/simple-maven-project-with-tests.git'
-                    sh "mvn -Dmaven.test.failure.ignore=true clean package"
-                }
-            }
-            post
-            {
-                success
-                {
-                    junit '**/build/target/surefire-reports/TEST-*.xml'
-                    archiveArtifacts 'build/target/*.jar'
-                }
+                echo("Simulated dev build stage — in a real org's pipeline, this is where the application under test would be built and packaged before QA automation runs. This project targets a public demo application, so there is nothing of ours to build here.")
             }
         }
         stage("Deploy to QA"){
             steps{
-                echo("deploy to qa done")
+                echo("Simulated deploy stage — represents the application under test being deployed to a QA environment before automation runs against it.")
             }
         }
         stage('Regression Automation Tests') {
@@ -69,7 +58,7 @@ pipeline
         }
         stage("Deploy to Stage"){
             steps{
-                echo("deploy to Stage")
+                echo("Simulated deploy stage — represents the application under test being deployed to a staging environment before the sanity suite runs.")
             }
         }
         stage('Sanity Automation Tests') {
@@ -99,7 +88,7 @@ pipeline
         }
         stage("Deploy to PROD"){
             steps{
-                echo("deploy to PROD")
+                echo("Simulated deploy stage — represents promotion to production after both regression and sanity suites have passed.")
             }
         }
     }
