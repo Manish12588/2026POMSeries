@@ -26,6 +26,14 @@ stages:
       - job: BuildJob
         displayName: 'Compile Project'
         steps:
+          - task:
+              displayName: 'Cache Maven Dependencies'
+              inputs:
+                key: 'maven | "$(Agent.OS)" | pom.xml'
+                restoreKeys: |
+                  maven | "$(Agent.OS)"
+                path: $(HOME)/.m2/repository
+
           - task: Maven@4
             displayName: 'Maven Compile'
             inputs:
@@ -41,6 +49,14 @@ stages:
       - job: TestJob
         displayName: 'Run Selenium Tests'
         steps:
+          - task:
+              displayName: 'Cache Maven Dependencies'
+              inputs:
+                key: 'maven | "$(Agent.OS)" | pom.xml'
+                restoreKeys: |
+                  maven | "$(Agent.OS)"
+                path: $(HOME)/.m2/repository
+
           - task: Maven@4
             displayName: 'Maven Test'
             inputs:
