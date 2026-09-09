@@ -64,11 +64,11 @@ Config values can also be overridden at runtime via matching `-D` JVM system pro
 **How execution routing works:**
 ```mermaid
 flowchart TD
-    A[TestNG suite] --> B["DriverFactory<br/>reads execMode"]
-    B -->|local| C["Local browser<br/>ChromeDriver"]
-    B -->|grid| D["Selenium Grid<br/>Docker: hub + nodes"]
-    C --> E["OpenCart demo app<br/>Public demo site"]
-    D --> E
+   A[TestNG suite] --> B["DriverFactory<br/>reads execMode"]
+   B -->|local| C["Local browser<br/>ChromeDriver"]
+   B -->|grid| D["Selenium Grid<br/>Docker: hub + nodes"]
+   C --> E["OpenCart demo app<br/>Public demo site"]
+   D --> E
 ```
 The same test code and suite XML run **unchanged** in both paths — only the `execMode` / `remote` config value, and correspondingly which `WebDriver` implementation `DriverFactory` instantiates, differ.
 
@@ -111,11 +111,11 @@ mvn clean deploy -DskipTests=true
 ## CI/CD — Jenkins
 ```mermaid
 flowchart TD
-    A["Build<br/>simulated"] --> B["Deploy to QA<br/>simulated"]
-    B --> C["Regression tests + reports<br/>chrome, firefox, edge · env=qa"]
-    C --> D["Deploy to Stage<br/>simulated"]
-    D --> E["Sanity tests + report<br/>smoke suite · env=stage"]
-    E --> F["Deploy to PROD<br/>simulated"]
+   A["Build<br/>simulated"] --> B["Deploy to QA<br/>simulated"]
+   B --> C["Regression tests + reports<br/>chrome, firefox, edge · env=qa"]
+   C --> D["Deploy to Stage<br/>simulated"]
+   D --> E["Sanity tests + report<br/>smoke suite · env=stage"]
+   E --> F["Deploy to PROD<br/>simulated"]
 ```
 
 The `Jenkinsfile` defines a pipeline with these stages:
@@ -140,8 +140,9 @@ A second, independently-built CI pipeline on Azure DevOps, connected to this Git
 
 ```mermaid
 flowchart TD
-    A["Build Stage<br/>mvn clean compile"] --> B["Test Stage<br/>mvn test, headless"]
-    B --> C["Publish results<br/>TestNG XML"]
+   A["Build Stage<br/>mvn clean compile"] --> B["Test Stage<br/>mvn test, headless"]
+   B --> C["Publish results<br/>TestNG XML"]
+   B -.optional, manual trigger only.-> D["Self-Hosted Agent Demo<br/>mvn test, headed, macOS"]
 ```
 
 **Current state:**
@@ -151,15 +152,16 @@ flowchart TD
 | **Build** | `Maven@4` task — `clean compile`, fails fast before browser/test setup runs |
 | **Test** | `Maven@4` task — runs the suite selected via the `suiteXmlFile` runtime parameter (dropdown at manual trigger; defaults to `testng_chrome.xml` on automatic CI runs) |
 | **Caching** | `Cache@2` task on both stages, keyed on `pom.xml` hash — cuts Maven dependency download time on repeat runs to the same branch |
+| **Self-Hosted Agent Demo** | Runs the same suite against a self-hosted macOS agent (Apple Silicon, native ARM64) instead of a Microsoft-hosted VM. Gated behind a `runOnSelfHostedAgent` boolean parameter, defaulting to `false` — automatic PR/CI triggers never invoke it, since the agent only listens while running interactively (`./run.sh`) on the local machine, not as a background service. Runs headed on purpose (not `-Dheadless=true`, unlike the other two stages) to allow watching the browser drive the test live. See [`docs/self-hosted-agent-setup.md`](docs/self-hosted-agent-setup.md) for the full setup process and issues hit along the way. |
 
-**Triggers:** `pr` validation on PRs targeting `main` (pipeline must pass before merge), `trigger` on push to `main`.
+**Triggers:** `pr` validation on PRs targeting `main` (pipeline must pass before merge), `trigger` on push to `main`. The self-hosted stage is manual-trigger-only — see above.
 
 **CI-specific decisions worth noting:**
 - Headless Chrome requires `--no-sandbox` and `--disable-dev-shm-usage` on Microsoft-hosted Linux agents (root/container execution, capped `/dev/shm`) — not needed for local runs, applied conditionally alongside the existing `headless` flag.
 - Config overrides (`-Dheadless=true -Denv=qa`, etc.) are read from JVM system properties and override the properties-file defaults, so the same `DriverFactory`/`OptionsManager` code path serves local and CI runs without duplication.
 
 **Not yet built (unlike the Jenkins pipeline above):**
-- [ ] Self-hosted agent
+- [x] Self-hosted agent
 - [ ] Selenium Grid execution
 - [ ] Allure / ChainTest report publishing
 - [ ] Deploy stages
