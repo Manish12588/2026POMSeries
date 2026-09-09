@@ -1,19 +1,49 @@
-# Starter pipeline
-# Start with a minimal pipeline that you can customize to build and deploy your code.
-# Add steps that build, run tests, deploy, and more:
-# https://aka.ms/yaml
-
 trigger:
 - main
+
+pr:
+  branches:
+    include:
+      - main
 
 pool:
   vmImage: ubuntu-latest
 
-steps:
-- script: echo Hello, world!
-  displayName: 'Run a one-line script'
+parameters:
+  - name: suiteXmlFile
+    displayName: 'TestNG Suite to Run'
+    type: string
+    default: 'testng_chrome.xml'
+    values:
+      - testng_chrome.xml
+      - testng_firefox.xml
+      - testng_regression.xml
 
-- script: |
-    echo Add other tasks to build, test, and deploy your project.
-    echo See https://aka.ms/yaml
-  displayName: 'Run a multi-line script'
+stages:
+  - stage: Build
+    displayName: 'Build Stage'
+    jobs:
+      - job: BuildJob
+        displayName: 'Compile Project'
+        steps:
+          - task: Maven@4
+            displayName: 'Maven Compile'
+            inputs:
+              mavenPomFile: 'pom.xml'
+              goals: 'clean compile'
+              options: '-Denv=qa'
+
+  - stage: Test
+    displayName: 'Test Execution Stage'
+    dependsOn: Build
+    condition: succeeded()
+    jobs:
+      - job: TestJob
+        displayName: 'Run Selenium Tests'
+        steps:
+          - task: Maven@4
+            displayName: 'Maven Test'
+            inputs:
+              mavenPomFile: 'pom.xml'
+              goal: 'test'
+              options: '-Denv=qa -Dheadless=true -DsuiteXmlFile=src/test/resources/testrunners/${{parameters.suiteXmlFile}}'
