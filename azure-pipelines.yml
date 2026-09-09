@@ -1,5 +1,5 @@
 trigger:
-- main
+  - main
 
 pr:
   branches:
@@ -26,13 +26,13 @@ stages:
       - job: BuildJob
         displayName: 'Compile Project'
         steps:
-          - task:
-              displayName: 'Cache Maven Dependencies'
-              inputs:
-                key: 'maven | "$(Agent.OS)" | pom.xml'
-                restoreKeys: |
-                  maven | "$(Agent.OS)"
-                path: $(HOME)/.m2/repository
+          - task: Cache@2
+            displayName: 'Cache Maven Dependencies'
+            inputs:
+              key: 'maven | "$(Agent.OS)" | pom.xml'
+              restoreKeys: |
+                maven | "$(Agent.OS)"
+              path: $(HOME)/.m2/repository
 
           - task: Maven@4
             displayName: 'Maven Compile'
@@ -49,17 +49,17 @@ stages:
       - job: TestJob
         displayName: 'Run Selenium Tests'
         steps:
-          - task:
-              displayName: 'Cache Maven Dependencies'
-              inputs:
-                key: 'maven | "$(Agent.OS)" | pom.xml'
-                restoreKeys: |
-                  maven | "$(Agent.OS)"
-                path: $(HOME)/.m2/repository
+          - task: Cache@2
+            displayName: 'Cache Maven Dependencies'
+            inputs:
+              key: 'maven | "$(Agent.OS)" | pom.xml'
+              restoreKeys: |
+                maven | "$(Agent.OS)"
+              path: $(HOME)/.m2/repository
 
           - task: Maven@4
             displayName: 'Maven Test'
             inputs:
               mavenPomFile: 'pom.xml'
-              goal: 'test'
-              options: '-Denv=qa -Dheadless=true -DsuiteXmlFile=src/test/resources/testrunners/${{parameters.suiteXmlFile}}'
+              goals: 'test'
+              options: '-Denv=qa -Dheadless=true -DsuiteXmlFile=src/test/resources/testrunners/${{ parameters.suiteXmlFile }}'
