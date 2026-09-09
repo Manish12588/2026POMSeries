@@ -7,9 +7,10 @@
 ![TestNG](https://img.shields.io/badge/TestNG-7.12.0-blue)
 ![Maven](https://img.shields.io/badge/Build-Maven-C71A36)
 ![Jenkins](https://img.shields.io/badge/CI-Jenkins-D24939)
+![Azure Pipelines](https://img.shields.io/badge/CI-Azure%20Pipelines-0078D7)
 ![Docker](https://img.shields.io/badge/Grid-Docker-2496ED)
 
-A Java + Selenium framework built around the Page Object Model, testing the [OpenCart demo application](https://naveenautomationlabs.com/opencart/) end to end — login, account, search, product info, and registration — with the plumbing to run it anywhere: your IDE, a Selenium Grid, or a Jenkins pipeline.
+A Java + Selenium framework built around the Page Object Model, testing the [OpenCart demo application](https://naveenautomationlabs.com/opencart/) end to end — login, account, search, product info, and registration — with the plumbing to run it anywhere: your IDE, a Selenium Grid, or a CI/CD pipeline.
 
 </div>
 
@@ -17,10 +18,14 @@ A Java + Selenium framework built around the Page Object Model, testing the [Ope
 
 ## Why this exists
 
-This is a portfolio project demonstrating a complete automation pipeline, not just a pile of test scripts: **local execution → cross-browser regression → Selenium Grid → full Maven lifecycle → CI/CD via Jenkins.** The goal was to build something close to what a real QA automation setup looks like inside an organization — same test code, different execution environments, driven entirely by config.
+This is a portfolio project demonstrating a complete automation pipeline, not just a pile of test scripts: **local execution → cross-browser regression → Selenium Grid → full Maven lifecycle → CI/CD.** The goal was to build something close to what a real QA automation setup looks like inside an organization — same test code, different execution environments, driven entirely by config.
+
+The pipeline is deliberately built twice, on two different CI platforms — **Jenkins** (self-hosted, full lifecycle) and **Azure Pipelines** (cloud-hosted, built incrementally as a hands-on learning track) — to demonstrate the same underlying test automation isn't tied to one CI ecosystem. The Azure implementation is intentionally a work in progress, documented stage-by-stage as it's built rather than dropped in as a finished artifact.
 
 ## Contents
 - [Architecture](#architecture)
+- [CI/CD — Jenkins](#cicd--jenkins)
+- [CI/CD — Azure Pipelines](#cicd--azure-pipelines)
 - [Running the tests](#running-the-tests)
 - [Project structure](#project-structure)
 - [Tech stack](#tech-stack)
@@ -53,6 +58,8 @@ Environment-specific settings live in `src/test/resources/config/` (`config.prop
 - `huburl` — Grid hub endpoint (used only when `remote=true`)
 - `headless`, `incognito`, `highlight` — browser behavior flags
 - application `url`, and test-account `username` / `password`
+
+Config values can also be overridden at runtime via matching `-D` JVM system properties (e.g. `-Dheadless=true -Denv=qa`), which take precedence over the properties-file defaults — the mechanism that lets the same `DriverFactory` / `OptionsManager` code path serve local, Grid, and CI runs without duplicating logic per environment.
 
 **How execution routing works:**
 ```mermaid
@@ -99,7 +106,9 @@ mvn clean deploy -DskipTests=true
 
 > **Current state:** the deploy step above is a capability exercised manually from a local machine — it's not yet wired into the Jenkins pipeline as an automated stage. Package/Deploy stages could be added to the `Jenkinsfile` using Jenkins' Credentials/Config File Provider plugin to inject `settings.xml` at build time.
 
-### CI/CD — Jenkins
+---
+
+## CI/CD — Jenkins
 ```mermaid
 flowchart TD
     A["Build<br/>simulated"] --> B["Deploy to QA<br/>simulated"]
@@ -125,6 +134,40 @@ The `Jenkinsfile` defines a pipeline with these stages:
 
 ---
 
+## CI/CD — Azure Pipelines
+
+A second, independently-built CI pipeline on Azure DevOps, connected to this GitHub repo via a service connection (not a repo migration — code stays on GitHub). Built incrementally, stage by stage, as a deliberate Azure DevOps learning exercise — see commit/PR history for the progression.
+
+```mermaid
+flowchart TD
+    A["Build Stage<br/>mvn clean compile"] --> B["Test Stage<br/>mvn test, headless"]
+    B --> C["Publish results<br/>TestNG XML"]
+```
+
+**Current state:**
+
+| Stage | What happens |
+|---|---|
+| **Build** | `Maven@4` task — `clean compile`, fails fast before browser/test setup runs |
+| **Test** | `Maven@4` task — runs the suite selected via the `suiteXmlFile` runtime parameter (dropdown at manual trigger; defaults to `testng_chrome.xml` on automatic CI runs) |
+| **Caching** | `Cache@2` task on both stages, keyed on `pom.xml` hash — cuts Maven dependency download time on repeat runs to the same branch |
+
+**Triggers:** `pr` validation on PRs targeting `main` (pipeline must pass before merge), `trigger` on push to `main`.
+
+**CI-specific decisions worth noting:**
+- Headless Chrome requires `--no-sandbox` and `--disable-dev-shm-usage` on Microsoft-hosted Linux agents (root/container execution, capped `/dev/shm`) — not needed for local runs, applied conditionally alongside the existing `headless` flag.
+- Config overrides (`-Dheadless=true -Denv=qa`, etc.) are read from JVM system properties and override the properties-file defaults, so the same `DriverFactory`/`OptionsManager` code path serves local and CI runs without duplication.
+
+**Not yet built (unlike the Jenkins pipeline above):**
+- [ ] Self-hosted agent
+- [ ] Selenium Grid execution
+- [ ] Allure / ChainTest report publishing
+- [ ] Deploy stages
+
+These are the next planned additions — being added incrementally rather than all at once, each as its own reviewed PR.
+
+---
+
 ## Running the tests
 
 ### 🖥️ Locally, from an IDE
@@ -145,6 +188,9 @@ mvn clean test -Dsurefire.suiteXmlFiles=src/test/resources/testrunners/testng_re
 
 ### 🔁 Via Jenkins
 The pipeline is triggered from `main` and runs the full regression → sanity flow described above, publishing both Allure and ChainTest HTML reports as build artifacts.
+
+### ☁️ Via Azure Pipelines
+Runs automatically on PRs targeting `main` (validation) and on push to `main` (CI). To run manually with a specific suite, use **Run pipeline** in Azure DevOps and select a value for the `suiteXmlFile` parameter.
 
 ---
 
@@ -167,4 +213,4 @@ src/
 ---
 
 ## Tech stack
-Java 17 · Selenium 4.47.0 · TestNG 7.12.0 · Maven · Log4j2 · Allure · ChainTest · Apache POI (Excel) · OpenCSV · Docker (Selenium Grid) · Jenkins · Nexus 3
+Java 17 · Selenium 4.47.0 · TestNG 7.12.0 · Maven · Log4j2 · Allure · ChainTest · Apache POI (Excel) · OpenCSV · Docker (Selenium Grid) · Jenkins · Azure Pipelines · Nexus 3
