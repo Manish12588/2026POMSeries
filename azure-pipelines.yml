@@ -9,6 +9,9 @@ pr:
 pool:
   vmImage: ubuntu-latest
 
+variables:
+  - group: opencart-qa-credentials
+
 parameters:
   - name: suiteXmlFile
     displayName: 'TestNG Suite to Run'
@@ -67,7 +70,7 @@ stages:
             inputs:
               mavenPomFile: 'pom.xml'
               goals: 'test'
-              options: '-Denv=qa -Dheadless=true -DsuiteXmlFile=src/test/resources/testrunners/${{ parameters.suiteXmlFile }}'
+              options: '-Denv=qa -Dheadless=true -Dusername=$(testUsername) -Dpassword=$(testPassword) -DsuiteXmlFile=src/test/resources/testrunners/${{ parameters.suiteXmlFile }}'
             continueOnError: true
 
           - script: mvn allure:report
@@ -101,7 +104,7 @@ stages:
             inputs:
               mavenPomFile: 'pom.xml'
               goals: 'test'
-              options: '-Denv=qa -DsuiteXmlFile=src/test/resources/testrunners/${{ parameters.suiteXmlFile }}'
+              options: '-Denv=qa -Dusername=$(testUsername) -Dpassword=$(testPassword) -DsuiteXmlFile=src/test/resources/testrunners/${{ parameters.suiteXmlFile }}'
             continueOnError: true
 
           - script: mvn allure:report
