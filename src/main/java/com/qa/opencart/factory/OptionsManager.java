@@ -19,8 +19,11 @@ public class OptionsManager {
         ChromeOptions chromeOption = new ChromeOptions();
         if (Boolean.parseBoolean(prop.getProperty("headless"))) {
             System.out.println("---- Running in headless mode ----- ");
-            chromeOption.addArguments("--headless");
+            chromeOption.addArguments("--headless=new");
+            chromeOption.addArguments("--no-sandbox");
+            chromeOption.addArguments("--disable-dev-shm-usage");
         }
+
         if (Boolean.parseBoolean(prop.getProperty("incognito"))) {
             System.out.println("---- Running in incognito mode ----- ");
             chromeOption.addArguments("--incognito");
@@ -34,7 +37,9 @@ public class OptionsManager {
     public FirefoxOptions getFirefoxOptions() {
         FirefoxOptions firefoxOption = new FirefoxOptions();
         if (Boolean.parseBoolean(prop.getProperty("headless"))) {
-            firefoxOption.addArguments("--headless");
+            firefoxOption.addArguments("--headless=new");
+            firefoxOption.addArguments("--no-sandbox");
+            firefoxOption.addArguments("--disable-dev-shm-usage");
         }
         if (Boolean.parseBoolean(prop.getProperty("incognito"))) {
             firefoxOption.addArguments("--incognito");
@@ -48,7 +53,9 @@ public class OptionsManager {
     public EdgeOptions getEdgeOptions() {
         EdgeOptions edgeOption = new EdgeOptions();
         if (Boolean.parseBoolean(prop.getProperty("headless"))) {
-            edgeOption.addArguments("--headless");
+            edgeOption.addArguments("--headless=new");
+            edgeOption.addArguments("--no-sandbox");
+            edgeOption.addArguments("--disable-dev-shm-usage");
         }
         if (Boolean.parseBoolean(prop.getProperty("incognito"))) {
             edgeOption.addArguments("--inprivate");

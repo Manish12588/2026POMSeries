@@ -176,9 +176,21 @@ public class DriverFactory {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+
+        // Allow CLI/CI overrides via -Dkey=value without editing property files
+        overridePropWithSystemProperty("headless");
+        overridePropWithSystemProperty("remote");
+        overridePropWithSystemProperty("browser");
         return properties;
     }
 
+    private void overridePropWithSystemProperty(String key) {
+        String sysVal = System.getProperty(key);
+        if (sysVal != null && !sysVal.isEmpty()) {
+            log.info("Overriding '{}' from system property: {}", key, sysVal);
+            properties.setProperty(key, sysVal);
+        }
+    }
     /**
      * TakeScreenShots
      */
