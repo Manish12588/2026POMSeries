@@ -111,11 +111,11 @@ mvn clean deploy -DskipTests=true
 ## CI/CD — Jenkins
 ```mermaid
 flowchart TD
-   A["Build<br/>simulated"] --> B["Deploy to QA<br/>simulated"]
-   B --> C["Regression tests + reports<br/>chrome, firefox, edge · env=qa"]
-   C --> D["Deploy to Stage<br/>simulated"]
-   D --> E["Sanity tests + report<br/>smoke suite · env=stage"]
-   E --> F["Deploy to PROD<br/>simulated"]
+    A["Build<br/>simulated"] --> B["Deploy to QA<br/>simulated"]
+    B --> C["Regression tests + reports<br/>chrome, firefox, edge · env=qa"]
+    C --> D["Deploy to Stage<br/>simulated"]
+    D --> E["Sanity tests + report<br/>smoke suite · env=stage"]
+    E --> F["Deploy to PROD<br/>simulated"]
 ```
 
 The `Jenkinsfile` defines a pipeline with these stages:
@@ -140,9 +140,10 @@ A second, independently-built CI pipeline on Azure DevOps, connected to this Git
 
 ```mermaid
 flowchart TD
-   A["Build Stage<br/>mvn clean compile"] --> B["Test Stage<br/>mvn test, headless"]
-   B --> C["Publish results<br/>TestNG XML"]
-   B -.optional, manual trigger only.-> D["Self-Hosted Agent Demo<br/>mvn test, headed, macOS"]
+    A["Build Stage<br/>mvn clean compile"] --> B["Test Stage<br/>mvn test, headless"]
+    B --> C["Generate + publish<br/>Allure report"]
+    B -.optional, manual trigger only.-> D["Self-Hosted Agent Demo<br/>mvn test, headed, macOS"]
+    D --> E["Generate + publish<br/>Allure report (self-hosted)"]
 ```
 
 **Current state:**
@@ -152,6 +153,7 @@ flowchart TD
 | **Build** | `Maven@4` task — `clean compile`, fails fast before browser/test setup runs |
 | **Test** | `Maven@4` task — runs the suite selected via the `suiteXmlFile` runtime parameter (dropdown at manual trigger; defaults to `testng_chrome.xml` on automatic CI runs) |
 | **Caching** | `Cache@2` task on both stages, keyed on `pom.xml` hash — cuts Maven dependency download time on repeat runs to the same branch |
+| **Allure reporting** | `mvn allure:report` runs after the test step (`continueOnError: true` on the test task, `condition: always()` on report generation/publish — so a report is still produced when tests fail, which is the case it matters most for). Published as a downloadable artifact (`allure-report` from Test, `allure-report-selfhosted` from the self-hosted stage — distinct names to avoid one overwriting the other). Screenshot-on-failure is embedded directly in the report via `TestAllureListener`'s `@Attachment`-annotated method — no separate artifact step needed for screenshots. |
 | **Self-Hosted Agent Demo** | Runs the same suite against a self-hosted macOS agent (Apple Silicon, native ARM64) instead of a Microsoft-hosted VM. Gated behind a `runOnSelfHostedAgent` boolean parameter, defaulting to `false` — automatic PR/CI triggers never invoke it, since the agent only listens while running interactively (`./run.sh`) on the local machine, not as a background service. Runs headed on purpose (not `-Dheadless=true`, unlike the other two stages) to allow watching the browser drive the test live. See [`docs/self-hosted-agent-setup.md`](docs/self-hosted-agent-setup.md) for the full setup process and issues hit along the way. |
 
 **Triggers:** `pr` validation on PRs targeting `main` (pipeline must pass before merge), `trigger` on push to `main`. The self-hosted stage is manual-trigger-only — see above.
@@ -162,9 +164,11 @@ flowchart TD
 
 **Not yet built (unlike the Jenkins pipeline above):**
 - [x] Self-hosted agent
+- [x] Allure report publishing (via downloadable artifact — see viewing note below)
 - [ ] Selenium Grid execution
-- [ ] Allure / ChainTest report publishing
 - [ ] Deploy stages
+
+**Not planned for Azure:** ChainTest reporting is Jenkins-plugin-based tooling with no Azure equivalent — Allure covers reporting on this pipeline instead, rather than attempting a like-for-like port.
 
 These are the next planned additions — being added incrementally rather than all at once, each as its own reviewed PR.
 
@@ -193,6 +197,15 @@ The pipeline is triggered from `main` and runs the full regression → sanity fl
 
 ### ☁️ Via Azure Pipelines
 Runs automatically on PRs targeting `main` (validation) and on push to `main` (CI). To run manually with a specific suite, use **Run pipeline** in Azure DevOps and select a value for the `suiteXmlFile` parameter.
+
+**Viewing the Allure report:** download the `allure-report` (or `allure-report-selfhosted`) artifact from the pipeline run's **Related → published** link, extract it, and serve it locally rather than opening `index.html` directly — Allure's report fetches its result data via JavaScript at runtime, which browsers block over `file://` due to CORS restrictions, leaving every panel stuck on "Loading...". Either:
+```bash
+cd allure-report && python3 -m http.server 8080   # then open http://localhost:8080
+```
+or, with the Allure CLI installed (`brew install allure`):
+```bash
+allure open allure-report
+```
 
 ---
 
