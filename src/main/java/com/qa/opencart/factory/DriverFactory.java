@@ -181,6 +181,8 @@ public class DriverFactory {
         overridePropWithSystemProperty("headless");
         overridePropWithSystemProperty("remote");
         overridePropWithSystemProperty("browser");
+        overridePropWithSystemProperty("username");
+        overridePropWithSystemProperty("password");
         return properties;
     }
 
