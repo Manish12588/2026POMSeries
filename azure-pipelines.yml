@@ -19,6 +19,11 @@ parameters:
       - testng_firefox.xml
       - testng_regression.xml
 
+  - name: runOnSelfHostedAgent
+    displayName: 'Run demo stage on self-hosted macOS agent (requires agent running locally)'
+    type: boolean
+    default: false
+
 stages:
   - stage: Build
     displayName: 'Build Stage'
@@ -63,3 +68,25 @@ stages:
               mavenPomFile: 'pom.xml'
               goals: 'test'
               options: '-Denv=qa -Dheadless=true -DsuiteXmlFile=src/test/resources/testrunners/${{ parameters.suiteXmlFile }}'
+
+  - stage: SelfHostedDemo
+    displayName: 'Self-Hosted Agent Demo'
+    dependsOn: Test
+    condition: and(succeeded(), eq('${{ parameters.runOnSelfHostedAgent }}', 'true'))
+    pool: 'macOS-local-agent'
+    jobs:
+      - job: SelfHostedJob
+        displayName: 'Run on Self-Hosted macOS Agent'
+        steps:
+          - script: |
+              echo "Running on self-hosted agent"
+              java -version
+              mvn -v
+            displayName: 'Verify agent environment'
+
+          - task: Maven@4
+            displayName: 'Maven Test (self-hosted)'
+            inputs:
+              mavenPomFile: 'pom.xml'
+              goals: 'test'
+              options: '-Denv=qa -DsuiteXmlFile=src/test/resources/testrunners/${{ parameters.suiteXmlFile }}'
