@@ -181,13 +181,16 @@ public class DriverFactory {
         overridePropWithSystemProperty("headless");
         overridePropWithSystemProperty("remote");
         overridePropWithSystemProperty("browser");
+        overridePropWithSystemProperty("username");
+        overridePropWithSystemProperty("password");
         return properties;
     }
 
     private void overridePropWithSystemProperty(String key) {
         String sysVal = System.getProperty(key);
         if (sysVal != null && !sysVal.isEmpty()) {
-            log.info("Overriding '{}' from system property: {}", key, sysVal);
+            String logVal = key.equalsIgnoreCase("password") ? "******" : sysVal;
+            log.info("Overriding '{}' from system property: {}", key, logVal);
             properties.setProperty(key, sysVal);
         }
     }
