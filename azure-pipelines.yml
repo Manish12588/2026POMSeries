@@ -68,6 +68,18 @@ stages:
               mavenPomFile: 'pom.xml'
               goals: 'test'
               options: '-Denv=qa -Dheadless=true -DsuiteXmlFile=src/test/resources/testrunners/${{ parameters.suiteXmlFile }}'
+            continueOnError: true
+
+          - script: mvn allure:report
+            displayName: 'Generate Allure Report'
+            condition: always()
+
+          - task: PublishBuildArtifacts@1
+            displayName: 'Publish Allure Report'
+            condition: always()
+            inputs:
+              PathToPublish: 'target/site/allure-maven-plugin'
+              ArtifactName: 'allure-report'
 
   - stage: SelfHostedDemo
     displayName: 'Self-Hosted Agent Demo'
@@ -90,3 +102,15 @@ stages:
               mavenPomFile: 'pom.xml'
               goals: 'test'
               options: '-Denv=qa -DsuiteXmlFile=src/test/resources/testrunners/${{ parameters.suiteXmlFile }}'
+            continueOnError: true
+
+          - script: mvn allure:report
+            displayName: 'Generate Allure Report (self-hosted)'
+            condition: always()
+
+          - task: PublishBuildArtifacts@1
+            displayName: 'Publish Allure Report (self-hosted)'
+            condition: always()
+            inputs:
+              PathToPublish: 'target/site/allure-maven-plugin'
+              ArtifactName: 'allure-report-selfhosted'
