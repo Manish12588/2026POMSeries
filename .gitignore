@@ -42,6 +42,7 @@ screenshots/
 allure-results/
 allure-report/
 extent-reports/
+.allure/
 
 # WebDriver binaries (if you drop them in-project instead of using WebDriverManager)
 *.exe
